@@ -12,3 +12,4 @@ cmd = "cd apps/api && node dist/main.js"
 
 [variables]
 CI = "true"
+NODE_ENV = "production"
