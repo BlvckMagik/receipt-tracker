@@ -1,8 +1,11 @@
 import 'reflect-metadata';
+import { config } from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { json, urlencoded } from 'express';
 import cors from 'cors';
+
+config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });

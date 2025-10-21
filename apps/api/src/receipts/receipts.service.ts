@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service.js';
-import { OcrService } from '../ocr/ocr.service.js';
-import { parseReceiptText } from '../ocr/parse.js';
+import { ChatgptService } from '../chatgpt/chatgpt.service.js';
 
 @Injectable()
 export class ReceiptsService {
-  constructor(private readonly db: DbService, private readonly ocr: OcrService) {}
+  constructor(private readonly db: DbService, private readonly chatgpt: ChatgptService) {}
 
   listReceipts() {
     const result = this.db.db.exec(`
@@ -79,13 +78,12 @@ export class ReceiptsService {
   }
 
   async processUpload(filePath: string, originalName: string) {
-    const text = await this.ocr.extractText(filePath);
-    const parsed = parseReceiptText(text);
+    const analysis = await this.chatgpt.analyzeReceipt(filePath);
 
     // Insert receipt
     this.db.db.exec(`
       INSERT INTO receipts (store, date, subtotal, tax, total, currency, filename, time, change_amount, check_number)
-      VALUES ('${parsed.store}', '${parsed.date}', ${parsed.subtotal}, ${parsed.tax}, ${parsed.total}, '${parsed.currency}', '${originalName}', '${parsed.time}', ${parsed.change}, '${parsed.checkNumber}')
+      VALUES ('${analysis.store}', '${analysis.date}', ${analysis.subtotal}, ${analysis.tax}, ${analysis.total}, '${analysis.currency}', '${originalName}', '${analysis.time}', ${analysis.change_amount}, '${analysis.check_number}')
     `);
 
     // Get the last inserted ID
@@ -93,13 +91,13 @@ export class ReceiptsService {
     const receiptId = result[0]?.values[0][0];
 
     // Insert items
-    for (const it of parsed.items) {
+    for (const item of analysis.items) {
       this.db.db.exec(`
         INSERT INTO items (receipt_id, name, qty, unit_price, line_total, vat_rate, barcode, category)
-        VALUES (${receiptId}, '${it.name}', ${it.qty}, ${it.unit_price}, ${it.line_total}, NULL, NULL, NULL)
+        VALUES (${receiptId}, '${item.name}', ${item.qty}, ${item.unit_price}, ${item.line_total}, NULL, NULL, '${item.category}')
       `);
     }
 
-    return { id: receiptId, parsed, text };
+    return { id: receiptId, analysis };
   }
 }
