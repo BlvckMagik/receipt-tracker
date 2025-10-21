@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "module": "es2022",
+    "moduleResolution": "node",
+    "target": "es2022",
+    "lib": [
+      "es2022",
+      "dom"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "baseUrl": "./",
+    "paths": {
+      "@receipt/shared": [
+        "../../packages/shared/src"
+      ]
+    }
+  },
+  "ts-node": {
+    "swc": true
+  },
+  "include": [
+    "src"
+  ]
+}
