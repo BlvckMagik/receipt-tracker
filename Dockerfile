@@ -6,13 +6,13 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copy package files
+# Copy all package files
 COPY package.json pnpm-lock.yaml ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 COPY packages/shared/package.json ./packages/shared/
 
-# Install dependencies
+# Install all dependencies
 RUN pnpm install --frozen-lockfile
 
 # Copy source code
@@ -34,25 +34,24 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files for production
 COPY package.json pnpm-lock.yaml ./
 COPY apps/api/package.json ./apps/api/
 
-# Install only production dependencies
+# Install only production dependencies for API
+WORKDIR /app/apps/api
 RUN pnpm install --frozen-lockfile --prod
 
 # Copy built API
-COPY --from=base /app/apps/api/dist ./apps/api/dist
-COPY --from=base /app/apps/api/eng.traineddata ./apps/api/
-COPY --from=base /app/apps/api/ukr.traineddata ./apps/api/
+COPY --from=base /app/apps/api/dist ./dist
+COPY --from=base /app/apps/api/eng.traineddata ./
+COPY --from=base /app/apps/api/ukr.traineddata ./
 
 # Copy built web app
-COPY --from=base /app/apps/web/dist ./apps/web/dist
+COPY --from=base /app/apps/web/dist ./web/dist
 
 # Create data directory for SQLite
 RUN mkdir -p /app/data
-
-WORKDIR /app/apps/api
 
 EXPOSE 3001
 

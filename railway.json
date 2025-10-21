@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd apps/api && pnpm start:dev",
+    "startCommand": "cd apps/web && pnpm install && pnpm build && cd ../api && pnpm install && pnpm build && node dist/main.js",
     "healthcheckPath": "/",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",

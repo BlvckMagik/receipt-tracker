@@ -1,0 +1,35 @@
+# Railway-optimized Dockerfile
+FROM node:18-alpine
+
+# Install pnpm
+RUN npm install -g pnpm
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+COPY packages/shared/package.json ./packages/shared/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build both apps
+RUN cd apps/api && pnpm build
+RUN cd apps/web && pnpm build
+
+# Create data directory
+RUN mkdir -p /app/data
+
+# Set working directory to API
+WORKDIR /app/apps/api
+
+# Expose port
+EXPOSE 3001
+
+# Start the application
+CMD ["node", "dist/main.js"]
