@@ -10,7 +10,9 @@
     "dev:api": "npm --prefix apps/api run start:dev",
     "dev:web": "npm --prefix apps/web run dev",
     "dev": "concurrently -n API,WEB -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
-    "build": "npm --prefix apps/api run build && npm --prefix apps/web run build"
+    "build": "npm --prefix apps/api run build && npm --prefix apps/web run build",
+    "start": "cd apps/api && node dist/main.js",
+    "deploy:build": "pnpm build && pnpm start"
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
