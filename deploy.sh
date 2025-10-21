@@ -2,19 +2,13 @@
 
 echo "🚀 Preparing for deployment..."
 
-# Build web app
-echo "📦 Building web app..."
-cd apps/web
+# Install dependencies
+echo "📦 Installing dependencies..."
 pnpm install
-pnpm build
-cd ../..
 
-# Build API
-echo "🔧 Building API..."
-cd apps/api
-pnpm install
+# Build both apps
+echo "🔧 Building applications..."
 pnpm build
-cd ../..
 
 echo "✅ Build completed successfully!"
 echo "📝 Next steps:"
