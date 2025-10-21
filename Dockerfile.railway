@@ -4,6 +4,9 @@ FROM node:18-alpine
 # Install pnpm
 RUN npm install -g pnpm
 
+# Set CI environment
+ENV CI=true
+
 WORKDIR /app
 
 # Copy package files
@@ -18,9 +21,8 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build both apps
-RUN cd apps/api && pnpm build
-RUN cd apps/web && pnpm build
+# Build applications
+RUN pnpm build
 
 # Create data directory
 RUN mkdir -p /app/data

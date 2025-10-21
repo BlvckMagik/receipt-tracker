@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["nodejs_18", "npm"]
+
+[phases.install]
+cmds = ["npm install -g pnpm", "CI=true pnpm install --frozen-lockfile"]
+
+[phases.build]
+cmds = ["CI=true pnpm build"]
+
+[start]
+cmd = "cd apps/api && node dist/main.js"
+
+[variables]
+CI = "true"
