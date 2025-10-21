@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service.js';
 import { ChatgptService } from '../chatgpt/chatgpt.service.js';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ReceiptsService {
@@ -47,23 +49,25 @@ export class ReceiptsService {
 
   listItems(q: string, category: string) {
     let sql = `SELECT * FROM items`;
-    const params: any[] = [];
     const parts: string[] = [];
     
     if (q) { 
-      parts.push(`name LIKE ?`);
-      params.push(`%${q}%`);
+      parts.push(`name LIKE '%${q.replace(/'/g, "''")}%'`);
     }
     if (category) { 
-      parts.push(`category = ?`);
-      params.push(category);
+      parts.push(`category = '${category.replace(/'/g, "''")}'`);
     }
     if (parts.length) sql += ' WHERE ' + parts.join(' AND ');
     sql += ' ORDER BY id DESC';
     
-    const stmt = this.db.db.prepare(sql);
-    const result = stmt.all(params);
-    return result || [];
+    const result = this.db.db.exec(sql);
+    return result[0]?.values.map((row: any[]) => {
+      const obj: any = {};
+      result[0].columns.forEach((col: string, i: number) => {
+        obj[col] = row[i];
+      });
+      return obj;
+    }) || [];
   }
 
   updateItem(id: number, body: any) {
@@ -84,7 +88,33 @@ export class ReceiptsService {
     params.push(id);
     const stmt = this.db.db.prepare(`UPDATE items SET ${sets.join(', ')} WHERE id = ?`);
     const result = stmt.run(params);
+    
+    // Save database to file
+    this.saveDatabase();
+    
     return { updated: result.changes || 0 };
+  }
+
+  getCategoryStats() {
+    const result = this.db.db.exec(`
+      SELECT 
+        category,
+        COUNT(*) as items_count,
+        SUM(line_total) as total_amount,
+        AVG(line_total) as avg_amount
+      FROM items 
+      WHERE category IS NOT NULL AND category != ''
+      GROUP BY category
+      ORDER BY total_amount DESC
+    `);
+    
+    return result[0]?.values.map((row: any[]) => {
+      const obj: any = {};
+      result[0].columns.forEach((col: string, i: number) => {
+        obj[col] = row[i];
+      });
+      return obj;
+    }) || [];
   }
 
   async processUpload(filePath: string, originalName: string) {
@@ -138,6 +168,15 @@ export class ReceiptsService {
       ]);
     }
 
+    // Save database to file
+    this.saveDatabase();
+
     return { id: receiptId, analysis };
+  }
+
+  private saveDatabase() {
+    const data = this.db.db.export();
+    const dbPath = path.join(process.cwd(), 'data', 'app.db');
+    fs.writeFileSync(dbPath, data);
   }
 }

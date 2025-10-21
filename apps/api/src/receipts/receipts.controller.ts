@@ -42,6 +42,11 @@ export class ReceiptsController {
     return this.service.listItems(q || '', category || '');
   }
 
+  @Get('/stats/categories')
+  getCategoryStats() {
+    return this.service.getCategoryStats();
+  }
+
   @Post('/items/:id')
   updateItem(@Param('id') id: string, @Body() body: any) {
     return this.service.updateItem(Number(id), body);

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { UploadZone } from './components/UploadZone'
 import { ReceiptDetails } from './components/ReceiptDetails'
+import { CategoryChart } from './components/CategoryChart'
 import { api } from './api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table'
 import { Badge } from './components/ui/badge'
 import { Button } from './components/ui/button'
-import { Receipt, Calendar, Store, FileText, DollarSign, Clock, Receipt as ReceiptIcon, Coins, Hash, ChevronDown, ChevronRight } from 'lucide-react'
+import { Receipt, Calendar, Store, FileText, DollarSign, Clock, Receipt as ReceiptIcon, Coins, Hash, ChevronDown, ChevronRight, BarChart3 } from 'lucide-react'
 
 type ReceiptData = {
   id: number
@@ -23,17 +24,38 @@ type ReceiptData = {
   filename?: string
 }
 
+type CategoryStat = {
+  category: string
+  items_count: number
+  total_amount: number
+  avg_amount: number
+}
+
 export default function App() {
   const [receipts, setReceipts] = useState<ReceiptData[]>([])
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
   const [receiptDetails, setReceiptDetails] = useState<Record<number, any>>({})
+  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([])
 
   const refresh = async () => {
     const r = await api.get('/receipts')
     setReceipts(r.data)
+    refreshStats()
   }
 
-  useEffect(() => { refresh() }, [])
+  const refreshStats = async () => {
+    try {
+      const r = await api.get('/receipts/stats/categories')
+      setCategoryStats(r.data)
+    } catch (error) {
+      console.error('Помилка завантаження статистики:', error)
+    }
+  }
+
+  useEffect(() => { 
+    refresh()
+    refreshStats()
+  }, [])
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '—'
@@ -83,6 +105,10 @@ export default function App() {
 
         <div className="mb-8">
           <UploadZone onUploaded={refresh} />
+        </div>
+
+        <div className="mb-8">
+          <CategoryChart data={categoryStats} />
         </div>
 
         <Card>
