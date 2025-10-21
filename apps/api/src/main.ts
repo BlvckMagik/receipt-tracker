@@ -4,8 +4,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { json, urlencoded } from 'express';
 import cors from 'cors';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { fileURLToPath } from 'url';
 
 config();
 
@@ -15,14 +16,25 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true }));
   app.use(cors());
 
-  // Serve static files from web app
-  app.useStaticAssets(join(__dirname, '../web/dist'));
-  app.setBaseViewsDir(join(__dirname, '../web/dist'));
+  // Serve static files from web app (only if they exist)
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const webDistPath = join(__dirname, '../web/dist');
   
-  // Catch-all handler for SPA
-  app.use('*', (req: any, res: any) => {
-    res.sendFile(join(__dirname, '../web/dist/index.html'));
-  });
+  try {
+    const fs = await import('fs');
+    if (fs.existsSync(webDistPath)) {
+      app.useStaticAssets(webDistPath);
+      app.setBaseViewsDir(webDistPath);
+      
+      // Catch-all handler for SPA
+      app.use('*', (req: any, res: any) => {
+        res.sendFile(join(webDistPath, 'index.html'));
+      });
+    }
+  } catch (error) {
+    console.log('Static files not found, serving API only');
+  }
 
   const port = process.env.PORT || 3001;
   await app.listen(port);

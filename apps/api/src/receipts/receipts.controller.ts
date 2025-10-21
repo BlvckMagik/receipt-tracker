@@ -13,6 +13,11 @@ export class ReceiptsController {
     return this.service.listReceipts();
   }
 
+  @Get('health')
+  health() {
+    return { status: 'ok', timestamp: new Date().toISOString() };
+  }
+
   @Get(':id')
   getOne(@Param('id') id: string) {
     return this.service.getReceipt(Number(id));
