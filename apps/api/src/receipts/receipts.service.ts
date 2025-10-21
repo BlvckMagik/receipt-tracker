@@ -84,8 +84,8 @@ export class ReceiptsService {
 
     // Insert receipt
     this.db.db.exec(`
-      INSERT INTO receipts (store, date, subtotal, tax, total, currency, filename)
-      VALUES ('${parsed.store}', '${parsed.date}', ${parsed.subtotal}, ${parsed.tax}, ${parsed.total}, '${parsed.currency}', '${originalName}')
+      INSERT INTO receipts (store, date, subtotal, tax, total, currency, filename, time, change_amount, check_number)
+      VALUES ('${parsed.store}', '${parsed.date}', ${parsed.subtotal}, ${parsed.tax}, ${parsed.total}, '${parsed.currency}', '${originalName}', '${parsed.time}', ${parsed.change}, '${parsed.checkNumber}')
     `);
 
     // Get the last inserted ID

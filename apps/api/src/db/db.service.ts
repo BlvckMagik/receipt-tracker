@@ -26,11 +26,14 @@ export class DbService implements OnModuleInit {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         store TEXT,
         date TEXT,
+        time TEXT,
         subtotal REAL,
         tax REAL,
         total REAL,
         currency TEXT,
         filename TEXT,
+        change_amount REAL,
+        check_number TEXT,
         created_at TEXT DEFAULT (datetime('now'))
       );
       CREATE TABLE IF NOT EXISTS items (

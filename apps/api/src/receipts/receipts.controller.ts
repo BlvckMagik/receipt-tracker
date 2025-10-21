@@ -26,7 +26,15 @@ export class ReceiptsController {
     }),
   }))
   async upload(@UploadedFile() file: Express.Multer.File) {
-    return this.service.processUpload(file.path, file.originalname);
+    try {
+      console.log('Отримано файл:', file.originalname, 'розмір:', file.size);
+      const result = await this.service.processUpload(file.path, file.originalname);
+      console.log('Обробка завершена успішно');
+      return result;
+    } catch (error) {
+      console.error('Помилка обробки файлу:', error);
+      throw error;
+    }
   }
 
   @Get('/items/all')
