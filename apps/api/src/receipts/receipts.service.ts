@@ -47,55 +47,95 @@ export class ReceiptsService {
 
   listItems(q: string, category: string) {
     let sql = `SELECT * FROM items`;
+    const params: any[] = [];
     const parts: string[] = [];
-    if (q) { parts.push(`name LIKE '%${q}%'`); }
-    if (category) { parts.push(`category = '${category}'`); }
+    
+    if (q) { 
+      parts.push(`name LIKE ?`);
+      params.push(`%${q}%`);
+    }
+    if (category) { 
+      parts.push(`category = ?`);
+      params.push(category);
+    }
     if (parts.length) sql += ' WHERE ' + parts.join(' AND ');
     sql += ' ORDER BY id DESC';
     
-    const result = this.db.db.exec(sql);
-    return result[0]?.values.map((row: any[]) => {
-      const obj: any = {};
-      result[0].columns.forEach((col: string, i: number) => {
-        obj[col] = row[i];
-      });
-      return obj;
-    }) || [];
+    const stmt = this.db.db.prepare(sql);
+    const result = stmt.all(params);
+    return result || [];
   }
 
   updateItem(id: number, body: any) {
     const fields = ['name','qty','unit_price','line_total','vat_rate','barcode','category'] as const;
     const sets: string[] = [];
+    const params: any[] = [];
+    
     for (const f of fields) {
-      if (f in body) { sets.push(`${f} = '${body[f]}'`); }
+      if (f in body) { 
+        sets.push(`${f} = ?`);
+        params.push(body[f]);
+      }
     }
     if (!sets.length) {
       return { updated: 0 };
     }
     
-    this.db.db.exec(`UPDATE items SET ${sets.join(', ')} WHERE id = ${id}`);
-    return { updated: 1 };
+    params.push(id);
+    const stmt = this.db.db.prepare(`UPDATE items SET ${sets.join(', ')} WHERE id = ?`);
+    const result = stmt.run(params);
+    return { updated: result.changes || 0 };
   }
 
   async processUpload(filePath: string, originalName: string) {
     const analysis = await this.chatgpt.analyzeReceipt(filePath);
 
+    // Екрануємо рядки для SQL
+    const escapeString = (str: string | null | undefined): string => {
+      if (!str) return '';
+      return str.replace(/'/g, "''");
+    };
+
     // Insert receipt
-    this.db.db.exec(`
+    const receiptStmt = this.db.db.prepare(`
       INSERT INTO receipts (store, date, subtotal, tax, total, currency, filename, time, change_amount, check_number)
-      VALUES ('${analysis.store}', '${analysis.date}', ${analysis.subtotal}, ${analysis.tax}, ${analysis.total}, '${analysis.currency}', '${originalName}', '${analysis.time}', ${analysis.change_amount}, '${analysis.check_number}')
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
+    
+    receiptStmt.run([
+      analysis.store,
+      analysis.date,
+      analysis.subtotal,
+      analysis.tax,
+      analysis.total,
+      analysis.currency,
+      originalName,
+      analysis.time,
+      analysis.change_amount,
+      analysis.check_number
+    ]);
 
     // Get the last inserted ID
     const result = this.db.db.exec(`SELECT last_insert_rowid() as id`);
     const receiptId = result[0]?.values[0][0];
 
     // Insert items
+    const itemStmt = this.db.db.prepare(`
+      INSERT INTO items (receipt_id, name, qty, unit_price, line_total, vat_rate, barcode, category)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    
     for (const item of analysis.items) {
-      this.db.db.exec(`
-        INSERT INTO items (receipt_id, name, qty, unit_price, line_total, vat_rate, barcode, category)
-        VALUES (${receiptId}, '${item.name}', ${item.qty}, ${item.unit_price}, ${item.line_total}, NULL, NULL, '${item.category}')
-      `);
+      itemStmt.run([
+        receiptId,
+        item.name,
+        item.qty,
+        item.unit_price,
+        item.line_total,
+        null,
+        null,
+        item.category
+      ]);
     }
 
     return { id: receiptId, analysis };

@@ -21,3 +21,5 @@ export type ReceiptItem = {
   barcode: string | null;
   category: string | null;
 };
+
+export * from './categories';
