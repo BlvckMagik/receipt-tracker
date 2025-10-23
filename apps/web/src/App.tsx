@@ -38,17 +38,24 @@ export default function App() {
   const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([])
 
   const refresh = async () => {
-    const r = await api.get('/receipts')
-    setReceipts(r.data)
+    try {
+      const r = await api.get('/receipts')
+      // API повертає {receipts: [], message: "..."}
+      setReceipts(r.data.receipts || [])
+    } catch (error) {
+      console.error('Помилка завантаження чеків:', error)
+      setReceipts([])
+    }
     refreshStats()
   }
 
   const refreshStats = async () => {
     try {
       const r = await api.get('/receipts/stats/categories')
-      setCategoryStats(r.data)
+      setCategoryStats(r.data || [])
     } catch (error) {
       console.error('Помилка завантаження статистики:', error)
+      setCategoryStats([])
     }
   }
 

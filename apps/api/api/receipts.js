@@ -9,6 +9,27 @@ export default function handler(req, res) {
     return;
   }
 
+  // Check if this is a stats endpoint
+  if (req.url.includes('/stats/categories')) {
+    if (req.method === 'GET') {
+      res.status(200).json([]);
+      return;
+    }
+  }
+
+  // Check if this is a specific receipt endpoint
+  if (req.url.match(/\/receipts\/\d+$/)) {
+    if (req.method === 'GET') {
+      const receiptId = req.url.split('/').pop();
+      res.status(200).json({
+        id: receiptId,
+        items: [],
+        message: `Receipt ${receiptId} details`
+      });
+      return;
+    }
+  }
+
   if (req.method === 'GET') {
     res.status(200).json({ 
       receipts: [],
