@@ -2,17 +2,30 @@
   "version": 2,
   "builds": [
     {
-      "src": "apps/api/src/express-server.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["apps/web/dist/**"]
-      }
+      "src": "apps/api/api/health.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "apps/api/api/receipts.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "apps/web/dist/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/api/health",
+      "dest": "/apps/api/api/health.js"
+    },
+    {
+      "src": "/api/receipts(.*)",
+      "dest": "/apps/api/api/receipts.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/apps/api/src/express-server.ts"
+      "dest": "/apps/web/dist/$1"
     }
   ],
   "installCommand": "pnpm install",
