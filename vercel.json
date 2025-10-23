@@ -1,35 +1,17 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "apps/api/api/health.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "apps/api/api/receipts.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "apps/web/dist/**",
-      "use": "@vercel/static"
-    }
-  ],
+  "buildCommand": "pnpm build",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "pnpm install",
+  "framework": "vite",
   "routes": [
     {
-      "src": "/api/health",
-      "dest": "/apps/api/api/health.js"
-    },
-    {
-      "src": "/api/receipts(.*)",
-      "dest": "/apps/api/api/receipts.js"
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/apps/web/dist/$1"
+      "dest": "/index.html"
     }
-  ],
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm build",
-  "outputDirectory": "apps/web/dist",
-  "framework": null
+  ]
 }
