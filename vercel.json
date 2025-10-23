@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build",
-  "outputDirectory": "apps/web/dist",
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
   "installCommand": "pnpm install",
   "framework": "vite",
   "routes": [
