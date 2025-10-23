@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/api/src/main.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["apps/api/dist/**", "apps/web/dist/**"]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/apps/api/src/main.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/apps/api/src/main.ts"
+    }
+  ],
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "apps/web/dist",
+  "framework": null,
+  "functions": {
+    "apps/api/src/main.ts": {
+      "includeFiles": "apps/api/dist/**"
+    }
+  }
+}
