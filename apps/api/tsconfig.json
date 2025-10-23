@@ -23,6 +23,6 @@
     "swc": true
   },
   "include": [
-    "src"
+    "src/**/*"
   ]
 }

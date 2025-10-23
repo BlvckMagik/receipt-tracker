@@ -7,3 +7,4 @@ apps/api/public/uploads/*
 !apps/api/public/uploads/.gitkeep
 apps/api/ocr-data/*
 !apps/api/ocr-data/.gitkeep
+.vercel
