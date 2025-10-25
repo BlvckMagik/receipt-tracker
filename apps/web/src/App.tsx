@@ -41,7 +41,7 @@ export default function App() {
     try {
       const r = await api.get('/receipts')
       // API повертає {receipts: [], message: "..."}
-      setReceipts(r.data.receipts || [])
+      setReceipts(r.data || [])
     } catch (error) {
       console.error('Помилка завантаження чеків:', error)
       setReceipts([])
