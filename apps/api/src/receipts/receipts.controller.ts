@@ -2,6 +2,7 @@ import { Controller, Get, Post, Param, Query, Body, UploadedFile, UseInterceptor
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
+import * as fs from 'fs';
 import { ReceiptsService } from './receipts.service.js';
 
 @Controller('receipts')
@@ -28,7 +29,6 @@ export class ReceiptsController {
     storage: diskStorage({
       destination: (_req, _file, cb) => {
         const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-        const fs = require('fs');
         if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
         cb(null, uploadDir);
       },
