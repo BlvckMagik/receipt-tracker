@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table'
 import { Badge } from './components/ui/badge'
 import { Button } from './components/ui/button'
-import { Receipt, Calendar, Store, FileText, DollarSign, Clock, Receipt as ReceiptIcon, Coins, Hash, ChevronDown, ChevronRight, BarChart3 } from 'lucide-react'
+import { Receipt, Calendar, Store, FileText, DollarSign, Clock, Receipt as ReceiptIcon, Coins, Hash, ChevronDown, ChevronRight, BarChart3, Trash2 } from 'lucide-react'
 
 type ReceiptData = {
   id: number
@@ -97,6 +97,22 @@ export default function App() {
       } catch (error) {
         console.error('Помилка завантаження деталей чеку:', error)
       }
+    }
+  }
+
+  const handleDelete = async (receiptId: number, event: React.MouseEvent) => {
+    event.stopPropagation()
+    if (!confirm('Ви впевнені, що хочете видалити цей чек?')) {
+      return
+    }
+    
+    try {
+      await api.delete(`/receipts/${receiptId}`)
+      refresh()
+      refreshStats()
+    } catch (error) {
+      console.error('Помилка видалення чеку:', error)
+      alert('Не вдалося видалити чек')
     }
   }
 
@@ -193,6 +209,7 @@ export default function App() {
                           Файл
                         </div>
                       </TableHead>
+                      <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -267,10 +284,20 @@ export default function App() {
                               <span className="text-muted-foreground">—</span>
                             )}
                           </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => handleDelete(receipt.id, e)}
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
                         </TableRow>
                         {expandedRows.has(receipt.id) && receiptDetails[receipt.id] && (
                           <TableRow>
-                            <TableCell colSpan={13} className="p-0">
+                            <TableCell colSpan={14} className="p-0">
                               <ReceiptDetails details={receiptDetails[receipt.id]} />
                             </TableCell>
                           </TableRow>

@@ -32,6 +32,7 @@ export class DbService implements OnModuleInit {
         total REAL,
         currency TEXT,
         filename TEXT,
+        image_path TEXT,
         change_amount REAL,
         check_number TEXT,
         created_at TEXT DEFAULT (datetime('now'))
@@ -49,6 +50,11 @@ export class DbService implements OnModuleInit {
         FOREIGN KEY (receipt_id) REFERENCES receipts(id) ON DELETE CASCADE
       );
     `);
+
+    try {
+      this.db.exec(`ALTER TABLE receipts ADD COLUMN image_path TEXT;`);
+    } catch (error) {
+    }
 
     // Save database to file
     const data = this.db.export();

@@ -128,8 +128,8 @@ export class ReceiptsService {
 
     // Insert receipt
     const receiptStmt = this.db.db.prepare(`
-      INSERT INTO receipts (store, date, subtotal, tax, total, currency, filename, time, change_amount, check_number)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO receipts (store, date, subtotal, tax, total, currency, filename, image_path, time, change_amount, check_number)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
     receiptStmt.run([
@@ -140,6 +140,7 @@ export class ReceiptsService {
       analysis.total,
       analysis.currency,
       originalName,
+      filePath,
       analysis.time,
       analysis.change_amount,
       analysis.check_number
@@ -172,6 +173,34 @@ export class ReceiptsService {
     this.saveDatabase();
 
     return { id: receiptId, analysis };
+  }
+
+  deleteReceipt(id: number) {
+    const receiptResult = this.db.db.exec(`SELECT image_path FROM receipts WHERE id = ${id}`);
+    
+    if (!receiptResult[0]?.values.length) {
+      return { deleted: 0, error: 'Receipt not found' };
+    }
+    
+    const imagePath = receiptResult[0].values[0][0];
+    
+    if (imagePath && fs.existsSync(imagePath)) {
+      try {
+        fs.unlinkSync(imagePath);
+      } catch (error) {
+        console.error('Помилка видалення файлу:', error);
+      }
+    }
+    
+    const itemsStmt = this.db.db.prepare(`DELETE FROM items WHERE receipt_id = ?`);
+    itemsStmt.run([id]);
+    
+    const stmt = this.db.db.prepare(`DELETE FROM receipts WHERE id = ?`);
+    const result = stmt.run([id]);
+    
+    this.saveDatabase();
+    
+    return { deleted: result.changes || 0 };
   }
 
   private saveDatabase() {

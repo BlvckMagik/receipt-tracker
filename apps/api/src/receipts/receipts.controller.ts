@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Query, Body, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Query, Body, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
@@ -60,5 +60,10 @@ export class ReceiptsController {
   @Post('/items/:id')
   updateItem(@Param('id') id: string, @Body() body: any) {
     return this.service.updateItem(Number(id), body);
+  }
+
+  @Delete(':id')
+  deleteReceipt(@Param('id') id: string) {
+    return this.service.deleteReceipt(Number(id));
   }
 }
