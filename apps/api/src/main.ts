@@ -19,7 +19,7 @@ async function bootstrap() {
   // Serve static files from web app (only if they exist)
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
-  const webDistPath = join(__dirname, '../web/dist');
+  const webDistPath = join(__dirname, '../../../web/dist');
   
   try {
     const fs = await import('fs');

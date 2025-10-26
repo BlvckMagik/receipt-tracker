@@ -9,6 +9,7 @@ coverage
 .vscode
 .idea
 *.log
-dist
-build
 .DS_Store
+apps/web/node_modules
+apps/api/node_modules
+packages/shared/node_modules

@@ -127,35 +127,7 @@ export function CategoryChart({ data }: CategoryChartProps) {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-          </div>
-
-          {/* Стовпчаста діаграма */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Витрати по категоріях</h3>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={100}
-                    fontSize={12}
-                  />
-                  <YAxis tickFormatter={(value) => formatCurrency(value)} />
-                  <Tooltip 
-                    formatter={(value) => [formatCurrency(Number(value)), 'Сума']}
-                    labelFormatter={(label, payload) => {
-                      const data = payload?.[0]?.payload
-                      return data?.fullName || label
-                    }}
-                  />
-                  <Bar dataKey="amount" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          </div>          
 
           {/* Детальна таблиця */}
           <div>

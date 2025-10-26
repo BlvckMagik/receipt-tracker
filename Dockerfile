@@ -23,10 +23,12 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build applications
-RUN pnpm build
+RUN cd apps/api && pnpm build
+RUN cd apps/web && pnpm build
 
-# Create data directory
-RUN mkdir -p /app/data
+# Create data directories
+RUN mkdir -p /app/apps/api/data
+RUN mkdir -p /app/apps/api/public/uploads
 
 # Set working directory to API
 WORKDIR /app/apps/api
