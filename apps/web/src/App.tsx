@@ -167,39 +167,13 @@ export default function App() {
                       <TableHead>
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
-                          Дата
-                        </div>
-                      </TableHead>
-                      <TableHead>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Час
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <DollarSign className="h-4 w-4" />
-                          Підсумок
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Coins className="h-4 w-4" />
-                          Податок
+                          Дата та час
                         </div>
                       </TableHead>
                       <TableHead className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <DollarSign className="h-4 w-4" />
                           Всього
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-center">Валюта</TableHead>
-                      <TableHead className="text-right">Здача</TableHead>
-                      <TableHead>
-                        <div className="flex items-center gap-2">
-                          <Hash className="h-4 w-4" />
-                          Чек №
                         </div>
                       </TableHead>
                       <TableHead className="text-right">Позицій</TableHead>
@@ -241,36 +215,15 @@ export default function App() {
                             )}
                           </TableCell>
                           <TableCell>
-                            {formatDate(receipt.date)}
-                          </TableCell>
-                          <TableCell>
-                            {receipt.time || <span className="text-muted-foreground">—</span>}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(receipt.subtotal)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatCurrency(receipt.tax)}
+                            <div className="flex flex-col">
+                              <span>{formatDate(receipt.date)}</span>
+                              {receipt.time && (
+                                <span className="text-xs text-muted-foreground">{receipt.time}</span>
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell className="text-right font-medium">
                             {formatCurrency(receipt.total)}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {receipt.currency ? (
-                              <Badge variant="outline">{receipt.currency}</Badge>
-                            ) : (
-                              <span className="text-muted-foreground">—</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {receipt.change_amount ? formatCurrency(receipt.change_amount) : <span className="text-muted-foreground">—</span>}
-                          </TableCell>
-                          <TableCell>
-                            {receipt.check_number ? (
-                              <Badge variant="outline">#{receipt.check_number}</Badge>
-                            ) : (
-                              <span className="text-muted-foreground">—</span>
-                            )}
                           </TableCell>
                           <TableCell className="text-right">
                             {receipt.items_count}
@@ -297,7 +250,7 @@ export default function App() {
                         </TableRow>
                         {expandedRows.has(receipt.id) && receiptDetails[receipt.id] && (
                           <TableRow>
-                            <TableCell colSpan={14} className="p-0">
+                            <TableCell colSpan={7} className="p-0">
                               <ReceiptDetails details={receiptDetails[receipt.id]} />
                             </TableCell>
                           </TableRow>
