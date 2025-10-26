@@ -205,7 +205,13 @@ export class ReceiptsService {
 
   private saveDatabase() {
     const data = this.db.db.export();
-    const dbPath = path.join(process.cwd(), 'data', 'app.db');
+    
+    let dataDir = process.env.DATA_DIR;
+    if (!dataDir) {
+      dataDir = fs.existsSync('/data') ? '/data' : path.join(process.cwd(), 'data');
+    }
+    
+    const dbPath = path.join(dataDir, 'app.db');
     fs.writeFileSync(dbPath, data);
   }
 }

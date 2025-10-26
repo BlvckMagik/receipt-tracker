@@ -9,7 +9,12 @@ export class DbService implements OnModuleInit {
 
   async onModuleInit() {
     const SQL = await initSqlJs();
-    const dataDir = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+    let dataDir = process.env.DATA_DIR;
+    
+    if (!dataDir) {
+      dataDir = fs.existsSync('/data') ? '/data' : path.join(process.cwd(), 'data');
+    }
+    
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
     const dbPath = path.join(dataDir, 'app.db');
     

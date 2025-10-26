@@ -28,7 +28,11 @@ export class ReceiptsController {
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: (_req, _file, cb) => {
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+        let uploadDir = process.env.UPLOAD_DIR;
+        if (!uploadDir) {
+          const dataDir = process.env.DATA_DIR || (fs.existsSync('/data') ? '/data' : path.join(process.cwd(), 'data'));
+          uploadDir = path.join(dataDir, 'uploads');
+        }
         if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
         cb(null, uploadDir);
       },
