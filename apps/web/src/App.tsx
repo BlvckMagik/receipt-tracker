@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { UploadZone } from './components/UploadZone'
 import { ReceiptDetails } from './components/ReceiptDetails'
 import { CategoryChart } from './components/CategoryChart'
+import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { api } from './api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table'
@@ -118,6 +119,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PWAInstallPrompt />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight mb-2">Receipt Tracker</h1>
