@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install dependencies separately to leverage Docker cache
 COPY package*.json ./
-RUN npm ci --omit=dev --no-audit --prefer-offline
+RUN npm install --omit=dev --no-audit --prefer-offline
 
 # Copy the rest of the source code
 COPY . .
