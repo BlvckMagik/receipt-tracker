@@ -44,21 +44,3 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: ghcr.io/${{ secrets.GHCR_USERNAME }}/receipt-web:latest
-
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Update containers on Raspberry Pi
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          script: |
-            docker pull ghcr.io/${{ secrets.GHCR_USERNAME }}/receipt-api:latest
-            docker pull ghcr.io/${{ secrets.GHCR_USERNAME }}/receipt-web:latest
-            docker compose -f ~/Documents/receipt-tracker/docker-compose.yml down
-            docker compose -f ~/Documents/receipt-tracker/docker-compose.yml up -d
