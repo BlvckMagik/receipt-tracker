@@ -1,0 +1,11 @@
+blvckmagic-receipt-tracker.online {
+    encode gzip
+
+    handle /api/* {
+        reverse_proxy rt_api:3001
+    }
+
+    handle {
+        reverse_proxy rt_web:5173
+    }
+}

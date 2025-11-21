@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    image: receipt-api
+    container_name: rt_api
+    restart: always
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "file:/data/db.sqlite"
+      PORT: 3001
+    expose:
+      - "3001"
+    volumes:
+      - ./apps/api/data:/data
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    image: receipt-web
+    container_name: rt_web
+    restart: always
+    environment:
+      VITE_API_URL: "http://rt_api:3001"
+    expose:
+      - "5173"
+
+  caddy:
+    image: caddy:alpine
+    container_name: rt_caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy_data:/data
+      - ./caddy_config:/config
