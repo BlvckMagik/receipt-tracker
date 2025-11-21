@@ -25,7 +25,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }} # або GHCR_PAT якщо так назвав
+          password: ${{ secrets.GHCR_PAT }} # або GHCR_PAT якщо так назвав
 
       - name: Build & push API image
         uses: docker/build-push-action@v6
