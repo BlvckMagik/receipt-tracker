@@ -7,7 +7,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - NODE_ENV=production
+      NODE_ENV: production
     networks:
       - rt_net
 
@@ -19,7 +19,7 @@ services:
     ports:
       - "5173:80"
     environment:
-      - VITE_API_URL=http://rt_api:3001
+      VITE_API_URL: http://rt_api:3001
     depends_on:
       - rt_api
     networks:
