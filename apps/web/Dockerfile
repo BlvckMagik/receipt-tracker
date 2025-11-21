@@ -1,8 +1,10 @@
 # Build stage
 FROM node:18-alpine as builder
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install --production=false
+RUN npm ci --prefer-offline --no-audit --fetch-timeout=600000
+
 COPY . .
 RUN npm run build
 
