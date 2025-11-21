@@ -1,8 +1,6 @@
 services:
   rt_api:
-    build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+    image: ghcr.io/blvckmagik/receipt-api:latest
     container_name: rt_api
     ports:
       - "3001:3001"
@@ -12,9 +10,7 @@ services:
       - rt_net
 
   rt_web:
-    build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+    image: ghcr.io/blvckmagik/receipt-web:latest
     container_name: rt_web
     ports:
       - "5173:80"
