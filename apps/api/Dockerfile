@@ -1,31 +1,39 @@
-# Base lightweight image for ARM (Raspberry Pi)
-FROM node:18-alpine3.19 AS builder
+# Build stage — Node 20 + pnpm
+FROM node:20-alpine AS builder
 
-# Set working directory
+# install pnpm
+RUN corepack enable && corepack prepare pnpm@9.12.0 --activate
+
 WORKDIR /app
 
-# Install dependencies separately to leverage Docker cache
-COPY package*.json ./
-RUN npm install --omit=dev --no-audit --prefer-offline
+# copy only manifest files to install deps
+COPY pnpm-lock.yaml ./
+COPY package.json ./
 
-# Copy the rest of the source code
+# install deps (prod+dev) with pnpm
+RUN pnpm install --frozen-lockfile
+
+# copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# build NestJS
+RUN pnpm build
 
 
 # -------------------------------
-# Production Image
+# Production image
 # -------------------------------
 
-FROM node:18-alpine3.19
+FROM node:20-alpine
+
+RUN corepack enable && corepack prepare pnpm@9.12.0 --activate
 
 WORKDIR /app
 
-# Copy only the built output + production deps
+# copy only necessary files
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY package.json .
 
 EXPOSE 3001
 
