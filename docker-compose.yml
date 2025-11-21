@@ -1,7 +1,10 @@
+version: "3.9"
+
 services:
   rt_api:
     image: ghcr.io/blvckmagik/receipt-api:latest
     container_name: rt_api
+    restart: unless-stopped
     ports:
       - "3001:3001"
     env_file:
@@ -14,12 +17,14 @@ services:
   rt_web:
     image: ghcr.io/blvckmagik/receipt-web:latest
     container_name: rt_web
+    restart: unless-stopped
     ports:
       - "5173:80"
-    environment:
-      VITE_API_URL: http://rt_api:3001
     env_file:
       - ./apps/web/.env
+    environment:
+      # URL всередині докер-мережі, не міняти!
+      VITE_API_URL: http://rt_api:3001
     depends_on:
       - rt_api
     networks:
