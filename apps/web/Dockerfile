@@ -10,7 +10,9 @@
     COPY pnpm-lock.yaml ./
     COPY package.json ./
     
-    RUN pnpm install --frozen-lockfile
+    RUN pnpm fetch && pnpm install --offline --frozen-lockfile --strict-peer-dependencies=false
+    # Retry in case of network hiccups
+    RUN pnpm install --offline --frozen-lockfile || (echo "Retrying install..." && pnpm install --offline --frozen-lockfile)
     
     COPY . .
     

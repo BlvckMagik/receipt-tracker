@@ -1,22 +1,19 @@
 # Build stage — Node 20 + pnpm
 FROM node:20-alpine AS builder
 
-# install pnpm
 RUN corepack enable && corepack prepare pnpm@9.12.0 --activate
 
 WORKDIR /app
 
-# copy only manifest files to install deps
+# copy lockfile and package.json
 COPY pnpm-lock.yaml ./
 COPY package.json ./
 
-# install deps (prod+dev) with pnpm
-RUN pnpm install --frozen-lockfile
+# install deps with retries + offline cache + max concurrency
+RUN pnpm install --frozen-lockfile --prefer-offline --reporter=silent --retry=5 --fetch-timeout=200000 --network-concurrency=1
 
-# copy source code
 COPY . .
 
-# build NestJS
 RUN pnpm build
 
 
@@ -29,6 +26,9 @@ FROM node:20-alpine
 RUN corepack enable && corepack prepare pnpm@9.12.0 --activate
 
 WORKDIR /app
+
+# copy pnpm offline cache
+COPY --from=builder /root/.pnpm-store /root/.pnpm-store
 
 # copy only necessary files
 COPY --from=builder /app/node_modules ./node_modules
