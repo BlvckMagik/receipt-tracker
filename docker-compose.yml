@@ -19,12 +19,12 @@ services:
     container_name: rt_web
     restart: unless-stopped
     ports:
-      - "5173:80"
+      - "80:80"
     env_file:
       - ./apps/web/.env
     environment:
       # URL всередині докер-мережі, не міняти!
-      VITE_API_URL: http://rt_api:3001
+      VITE_API_URL: https://blvckmagic-receipt-tracker.online
     depends_on:
       - rt_api
     networks:
